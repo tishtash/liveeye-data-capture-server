@@ -1,0 +1,19 @@
+{
+  "name": "liveeye-datacapture-server",
+  "version": "1.0.0",
+  "description": "Live Eye Surveillance L.L.C Data Capturing Server Codebase",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://ndugg05@bitbucket.org/ndugg05/liveeye-data-capture-server.git"
+  },
+  "dependencies": {
+    "serialport": "^7.1.5"
+  },
+  "author": "Live Eye Surveillance L.L.C.",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/ndugg05/liveeye-data-capture-server#readme"
+}
