@@ -1,0 +1,13 @@
+[Unit]
+Description=Live Eye Data Capture Service
+After=network.target
+
+[Service]
+WorkingDirectory=/home/pi/Documents/liveeye-data-capture
+ExecStart=/usr/local/bin/npm run start
+Restart=on-failure
+User=pi
+Environment=PORT=8000
+
+[Install]
+WantedBy=multi-user.target
