@@ -1,33 +1,52 @@
 const net = require('net');
 const server = net.createServer();
 
-const start = () => {
-	server.listen({
-		port: 8000
-	}, () => {
-		console.log(`Opened Server on `, server.address());
-	})
+class tcpServer {
+	constructor() {
+		this.socketRef = null;
+	}
 
-	server.on('error', (err) => {
-		console.log(`Error:: ${err}`);
-	})
 
-	server.on('connection', (socket) => {
-		console.log('A Connection Has Been Established');
-		socket.write(Buffer.from('Live Eye Surveillance.\nData Capture Processor Has Been Initialized\n'));
-		let intervalVar = setInterval(() => socket.write(Buffer.from('Testing \n')), 5000);
+	initializeConnection() {
+		this.setupServer();
+		this.startConnection();
+	}
 
-		socket.on('error', (err) => {
-			console.log(`Socket Errored out ${err}`);
+	setupServer() {
+		server.listen({
+			port: 8000
+		}, () => {
+			console.log(`Opened Server on `, server.address());
+		})
+	}
+
+	startConnection() {
+		server.on('error', (err) => {
+			this.socketRef = null;
+			console.log(`Error:: ${err}`);
 		})
 
-		socket.on('end', () => {
-			clearInterval(intervalVar);
-			console.log('Closing connection with the socket');
+		server.on('connection', (socket) => {
+			console.log('A Connection Has Been Established');
+			this.socketRef = socket;
+
+			socket.on('error', (err) => {
+				this.socketRef = null;
+				console.log(`Socket Errored out ${err}`);
+			})
+
+			socket.on('end', () => {
+				this.socketRef = null;
+				console.log('Closing connection with the socket');
+			})
 		})
-	})
+	}
+
+	writeData(bufferData) {
+		if(this.socketRef) {
+			this.socketRef.write(bufferData);
+		}
+	}
 }
 
-module.exports = {
-	start: start
-}
+module.exports = tcpServer;
