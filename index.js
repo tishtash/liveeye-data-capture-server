@@ -17,7 +17,7 @@ const setComName = async () => {
 		let server = new tcpServer();
 		server.initializeConnection();
 		
-		for (let idx = 0; idx < comList.length; idx++) {
+		for (let idx = 1; idx < comList.length; idx++) {
 			console.log(comList[idx].comName);
 			let serialPort = new LiveEyeSerialPort(comList[idx].comName);
 			serialPort.initializePort();

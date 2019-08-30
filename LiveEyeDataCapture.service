@@ -3,7 +3,7 @@ Description=Live Eye Data Capture Service
 After=network.target
 
 [Service]
-WorkingDirectory=/home/pi/Documents/liveeye-data-capture-server
+WorkingDirectory=/home/pi/liveeye-data-capture-server
 ExecStart=/usr/local/bin/npm run start
 Restart=on-failure
 User=pi

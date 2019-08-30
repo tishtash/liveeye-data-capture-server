@@ -43,9 +43,8 @@ class LiveEyeSerialPort {
         });
 
         this.parser.on('data', (data) => {
-            this.server.writeData(data);
             if (data) {
-                console.log(data.toString());
+                this.server.writeData(data);
             }
         })
     }
