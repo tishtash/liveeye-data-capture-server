@@ -38,16 +38,17 @@ const comPortSetup = async socketRef => {
       //     ),
       //   3000
       // );
-
-      setTimeout(() => setupPort(comList[idx].comName), 300);
-      setTimeout(() => readPort(comList[idx].comName, socketRef), 500);
+      let portRef = getPortObj(comList[idx].comName);
+      readPort(portRef, comList[idx].comName, socketRef);
+      // setTimeout(() => getPortObj(comList[idx].comName), 300);
+      // setTimeout(() => readPort(comList[idx].comName, socketRef), 500);
     }
   } catch (err) {
     console.log(`${new Date()}::${err}`);
   }
 };
 
-const setupPort = portName => {
+const getPortObj = portName => {
   let portRef = new SerialPort(portName, {
     baudRate: 9600,
     autoOpen: false,
@@ -57,10 +58,11 @@ const setupPort = portName => {
     xon: true,
     xoff: true
   });
+  return portRef;
 };
 
-const readPort = (portName, socket) => {
-  portName.open(err => {
+const readPort = (portRef, portName, socket) => {
+  portRef.open(err => {
     if (err) {
       console.log(`${new Date()}::Error Opening Port::${err}`);
     }
@@ -68,7 +70,7 @@ const readPort = (portName, socket) => {
 
   // setupParser(portName);
 
-  portName.on("data", data => {
+  portRef.on("data", data => {
     if (data) {
       socket.emit(portName, data);
     }
