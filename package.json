@@ -12,7 +12,8 @@
     "url": "git+https://ndugg05@bitbucket.org/ndugg05/liveeye-data-capture-server.git"
   },
   "dependencies": {
-    "serialport": "^7.1.5"
+    "serialport": "^7.1.5",
+    "socket.io": "^2.3.0"
   },
   "author": "Live Eye Surveillance L.L.C.",
   "license": "ISC",
