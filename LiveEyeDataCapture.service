@@ -4,8 +4,9 @@ After=network.target
 
 [Service]
 WorkingDirectory=/home/pi/liveeye-data-capture-server
-ExecStart=/usr/local/bin/npm run start
+ExecStart=/usr/local/bin/npm run start-socket
 Restart=on-failure
+RestartSec=60s
 User=pi
 Environment=PORT=8000
 
