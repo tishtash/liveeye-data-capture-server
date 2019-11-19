@@ -51,7 +51,7 @@ const comPortSetup = async socketRef => {
 const getPortObj = portName => {
   let portRef = new SerialPort(portName, {
     baudRate: 9600,
-    autoOpen: false,
+    autoOpen: true,
     dataBits: 8,
     stopBits: 1,
     parity: "none",
@@ -62,11 +62,11 @@ const getPortObj = portName => {
 };
 
 const readPort = (portRef, portName, socket) => {
-  portRef.open(err => {
-    if (err) {
-      console.log(`${new Date()}::Error Opening Port::${err}`);
-    }
-  });
+  // portRef.open(err => {
+  //   if (err) {
+  //     console.log(`${new Date()}::Error Opening Port::${err}`);
+  //   }
+  // });
 
   // setupParser(portName);
 
@@ -74,6 +74,14 @@ const readPort = (portRef, portName, socket) => {
     if (data) {
       socket.emit(portName, data);
     }
+  });
+
+  portRef.on("error", err => {
+    console.log(`${new Date()}::Error Event Received On Port::${err}`);
+  });
+
+  portRef.on("close", closeData => {
+    console.log(`${new Date()}::Close Event Received On Port::${closeData}`);
   });
 };
 
