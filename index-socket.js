@@ -2,7 +2,7 @@ const Server = require("socket.io");
 const SerialPort = require("serialport");
 const Readline = require("@serialport/parser-readline");
 const io = new Server(8000, { path: "/data" });
-
+let initialConnection = true;
 console.log(`${new Date()}::Server Started`);
 
 const getComList = () => {
@@ -16,6 +16,7 @@ io.on("connection", function(socket) {
 
   socket.on("disconnect", function() {
     console.log(`${new Date()}::User Disconnected`);
+    initialConnection = false;
   });
 
   comPortSetup(socket);
@@ -23,8 +24,8 @@ io.on("connection", function(socket) {
 
 const comPortSetup = async socketRef => {
   try {
-    // let comList = [{}, { comName: "Data-1" }, { comName: "Data-2" }];
-    let comList = await getComList();
+    let comList = [{}, { comName: "Data-1" }, { comName: "Data-2" }];
+    // let comList = await getComList();
 
     for (let idx = 1; idx < comList.length; idx++) {
       console.log(comList[idx].comName);
@@ -38,10 +39,14 @@ const comPortSetup = async socketRef => {
       //     ),
       //   3000
       // );
-      let portRef = getPortObj(comList[idx].comName);
-      readPort(portRef, comList[idx].comName, socketRef);
-      // setTimeout(() => getPortObj(comList[idx].comName), 300);
-      // setTimeout(() => readPort(comList[idx].comName, socketRef), 500);
+
+      if (initialConnection) {
+        console.log(`${new Date()}::Opening a New Connection`);
+        let portRef = getPortObj(comList[idx].comName);
+        readPort(portRef, comList[idx].comName, socketRef);
+      } else {
+        console.log(`${new Date()}::Using Existing Connection`);
+      }
     }
   } catch (err) {
     console.log(`${new Date()}::${err}`);
