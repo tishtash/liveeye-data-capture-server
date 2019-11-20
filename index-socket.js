@@ -4,6 +4,7 @@ const Readline = require("@serialport/parser-readline");
 const io = new Server(8000, { path: "/data" });
 let initialConnection = true;
 let socketReference = null;
+let logOnce = true;
 console.log(`${new Date()}::Server Started`);
 
 const getComList = () => {
@@ -18,6 +19,7 @@ io.on("connection", function(socket) {
   socket.on("disconnect", function() {
     console.log(`${new Date()}::User Disconnected`);
     initialConnection = false;
+    logOnce = true;
   });
 
   comPortSetup(socket);
@@ -79,7 +81,10 @@ const readPort = (portRef, portName) => {
   portRef.on("data", data => {
     if (data) {
       const socketObj = getSocket();
-      console.log(`${new Date()}::Received Socket ID::${socketObj.id}`);
+      if (logOnce) {
+        console.log(`${new Date()}::Received Socket ID::${socketObj.id}`);
+        logOnce = false;
+      }
       socketObj.emit(portName, data);
     }
   });
