@@ -2,9 +2,9 @@ const Server = require("socket.io");
 const SerialPort = require("serialport");
 const Readline = require("@serialport/parser-readline");
 const io = new Server(8000, { path: "/data" });
-let initialConnection = true;
 let socketReference = null;
 let logOnce = true;
+let portRefMapper = {};
 console.log(`${new Date()}::Server Started`);
 
 const getComList = () => {
@@ -14,11 +14,24 @@ const getComList = () => {
 };
 
 io.on("connection", function(socket) {
+  if (socketReference !== null) {
+    console.log(
+      `An existing connection is alive ${socketReference.id}. Killing the connection`
+    );
+    socketReference.disconnect(true);
+  }
   console.log(`${new Date()}::A User Has Been Connected`);
   setSocket(socket);
-  socket.on("disconnect", function() {
+  socket.on("disconnect", function(reason) {
     console.log(`${new Date()}::User Disconnected`);
-    initialConnection = false;
+    console.log(`Reason:: ${reason}`);
+    socket.disconnect(true);
+    Object.keys(portRefMapper).map(portName => {
+      if (portRefMapper[portName].isOpen) {
+        portRefMapper[portName].close();
+      }
+    });
+    socketReference = null;
     logOnce = true;
   });
 
@@ -39,17 +52,12 @@ const comPortSetup = async socketRef => {
 
     for (let idx = 1; idx < comList.length; idx++) {
       console.log(comList[idx].comName);
-      socketRef.emit("Connection-List", comList[idx].comName);
-
-      if (initialConnection) {
-        console.log(`${new Date()}::Opening a New Connection`);
-        // emitDummyData(comList[idx].comName);
-        let portRef = getPortObj(comList[idx].comName);
-        readPort(portRef, comList[idx].comName);
-      } else {
-        console.log(`${new Date()}::Using Existing Connection`);
-        // emitDummyData(comList[idx].comName);
-      }
+      // socketRef.emit("Connection-List", comList[idx].comName);
+      io.to(`${socketRef.id}`).emit(("Connection-List", comList[idx].comName));
+      // emitDummyData(comList[idx].comName);
+      let portRef = getPortObj(comList[idx].comName);
+      portRefMapper[comList[idx].comName] = portRef;
+      readPort(portRef, comList[idx].comName);
     }
   } catch (err) {
     console.log(`${new Date()}::${err}`);
@@ -81,11 +89,14 @@ const readPort = (portRef, portName) => {
   portRef.on("data", data => {
     if (data) {
       const socketObj = getSocket();
-      if (logOnce) {
-        console.log(`${new Date()}::Received Socket ID::${socketObj.id}`);
-        logOnce = false;
+      if (socketObj !== null) {
+        if (logOnce) {
+          console.log(`${new Date()}::Received Socket ID::${socketObj.id}`);
+          logOnce = false;
+        }
+        io.to(`${socketObj.id}`).emit((`${portName}`, data));
+        // socketObj.emit(portName, data);
       }
-      socketObj.emit(portName, data);
     }
   });
 
