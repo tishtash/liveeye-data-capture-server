@@ -53,7 +53,7 @@ const comPortSetup = async socketRef => {
     for (let idx = 1; idx < comList.length; idx++) {
       console.log(comList[idx].comName);
       // socketRef.emit("Connection-List", comList[idx].comName);
-      io.to(`${socketRef.id}`).emit(("Connection-List", comList[idx].comName));
+      io.to(`${socketRef.id}`).emit("Connection-List", comList[idx].comName);
       // emitDummyData(comList[idx].comName);
       let portRef = getPortObj(comList[idx].comName);
       portRefMapper[comList[idx].comName] = portRef;
@@ -94,7 +94,7 @@ const readPort = (portRef, portName) => {
           console.log(`${new Date()}::Received Socket ID::${socketObj.id}`);
           logOnce = false;
         }
-        io.to(`${socketObj.id}`).emit((`${portName}`, data));
+        io.to(`${socketObj.id}`).emit(`${portName}`, data);
         // socketObj.emit(portName, data);
       }
     }
